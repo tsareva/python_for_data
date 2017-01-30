@@ -1,4 +1,30 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+import codecs, csv
+
 import os
+
+def read_csv_file(filename):
+	with codecs.open(filename, 'r', 'utf-8-sig') as file:
+		print "Getting data from... ", filename
+		opened_file = csv.reader(file, delimiter=';')
+		fieldnames = next(opened_file) 
+		data = []
+		for row in opened_file:
+			data.append(row)
+	return data
+
+data = read_csv_file('faculties.csv')
+faculties = dict()
+
+for row in data:
+	value = row[1] + " (" + row[2] + ")"
+	faculties[row[0]] = value 
+
 NUM_OF_FIELDS = 27
 
 #create list of file names
@@ -37,7 +63,11 @@ for (filename) in filelist:
 			if not output:
 				continue
 			if (fields == NUM_OF_FIELDS):
-				writef.write(filename+";")
+				faculty = filename.replace(".sps", "")
+				for key, value in faculties.iteritems():
+					if faculty.find(key) is not -1:
+						faculty = faculty.replace(key, value)
+				writef.write(faculty+";")
 			writef.write(line)
 			fields -= line.count(";")
 			if fields <= 0:
