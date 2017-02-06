@@ -25,6 +25,7 @@ def read_csv_file(filename):
 	return data
 
 def write_to_result(filename, data, fieldnames):
+	print "Saving results..."
 	result_file = codecs.open(filename, "wb", "utf-8-sig")
 	writer = csv.writer(result_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_ALL)
 	writer.writerow(fieldnames)
@@ -100,13 +101,22 @@ def reshape_data(data):
 					new_row.append(row[n])
 				new_row.append(questionaire[data[0][i]])
 				new_row.append(row[i])
+				for TextAnswer, NumericAnswer in coding_dict.iteritems():
+					if row[i].find(TextAnswer) is -1:
+						continue
+					else:
+						new_row.append(NumericAnswer)
 				data_for_tableau.append(new_row)
+	print "Data were reshaped for Tableau presentation"
 	return data_for_tableau
 		
 
 fieldnames = create_fieldnames('fieldnames.txt')
 data = read_csv_file(data_file)
 questionaire = create_q_dictionary('quiestions.csv')
+
+print "For adding numeric answers:"
+coding_dict = create_q_dictionary('code_for_numerics.csv')
 
 range_of_multvar_q = define_range_of_multi_columns(find_n_of_multq_columns(data))
 range_of_onevar_q = define_range_of_single_columns(data)
