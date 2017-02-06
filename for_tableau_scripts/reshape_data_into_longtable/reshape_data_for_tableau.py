@@ -3,8 +3,14 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
 import codecs, csv
+
+data_file = 'labeled_data.csv'
+status = 4 # number for column with interview status
+passport_range = [0, 21, 22, 23, 29, 62, 68] 
+# numbers for columns with passport information
+# id, district, sex, age, education, faith, how long live in SPb	
+
 
 print "This script reshape data set from CATI to Tableau format."
 
@@ -36,7 +42,6 @@ def create_fieldnames(filename):
 	return fieldnames
 
 def create_q_dictionary(filename):
-	print "Creating list of questionaire frом ", filename
 	quiestions = read_csv_file(filename)
 	questionaire = dict()
 	for row in quiestions:
@@ -51,7 +56,6 @@ def find_n_of_multq_columns(data):
 			n = int(item[1:i])
 			if n not in list_of_col:
 				list_of_col.append(n)
-	print list_of_col, " columns for multiple questions were found in data"
 	return list_of_col
 
 def define_range_of_multi_columns(list_of_col):
@@ -67,7 +71,6 @@ def define_range_of_multi_columns(list_of_col):
 				mult_set.append(col_n)
 		range_of_multvar_q.append(c_name)
 		range_of_multvar_q.append(mult_set)
-	print "Ranges for multiple questions are: \n(id of question in questionaire goes first, then - list of columns in data set with answers to multi-question)\n", range_of_multvar_q
 	return range_of_multvar_q 
 	#range_of_multvar_q[n][0] = id of question in questionaire
 	#range_of_multvar_q[n][1] = list of columns in data set with answers to multi-question
@@ -82,7 +85,6 @@ def define_range_of_single_columns(data):
 			if (col_n not in passport_range
 					and col_n not in range_of_multvar_q[1]):
 				range_of_onevar_q.append(col_n)
-	print "Ranges for single questions are:", range_of_onevar_q
 	return range_of_onevar_q
 
 def reshape_data(data):
@@ -90,7 +92,7 @@ def reshape_data(data):
 	data_for_tableau = []
 	for i in range_of_onevar_q:
 		for row in data_without_header:
-			if int(row[4]) < 0:
+			if int(row[status]) < 0: #check if interview was finished
 				continue
 			else:
 				new_row = []
@@ -99,16 +101,11 @@ def reshape_data(data):
 				new_row.append(questionaire[data[0][i]])
 				new_row.append(row[i])
 				data_for_tableau.append(new_row)
-	print "Data were reshaped for Tableau presentation"
 	return data_for_tableau
+		
 
-passport_range = [0, 21, 22, 23, 29, 62, 68] 
-# id, district, sex, age, education, faith, how long live in SPb	
-	
-	
 fieldnames = create_fieldnames('fieldnames.txt')
-data = read_csv_file('labeled_data.csv')
-coding = read_csv_file('numeric_data.csv')
+data = read_csv_file(data_file)
 questionaire = create_q_dictionary('quiestions.csv')
 
 range_of_multvar_q = define_range_of_multi_columns(find_n_of_multq_columns(data))
@@ -116,5 +113,5 @@ range_of_onevar_q = define_range_of_single_columns(data)
 
 data_for_tableau = reshape_data(data)
 		
-#write_to_result('isaak_for_tableau.csv', data_for_tableau, fieldnames)
+write_to_result('data_for_tableau.csv', data_for_tableau, fieldnames)
 #нет функции для добавления мультивопросов
