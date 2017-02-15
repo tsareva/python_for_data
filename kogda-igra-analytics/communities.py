@@ -5,14 +5,9 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import codecs, csv
 
-import urllib, vkontakte
+import urllib, vkontakte, pprint
+import time
 
-def find_out_token(url):
-	token_start = url.index("token=") + 6
-	token_end = url.index("&expires_in")
-	token = url[token_start:token_end]
-	return token
-	
 def create_fieldnames(dictionary):
 	dict = user_info[0]
 	fieldnames = []
@@ -29,40 +24,49 @@ def write_to_result(filename, data, fieldnames):
 		writer.writerow(row)
 	print "Results were saved in ", filename
 	result_file.close()
-	
-url_1 = 'https://oauth.vk.com/authorize?client_id='
-client_id = '5866966' #application id from settings
-url_2 = '&display=page&redirect_uri=https://oauth.vk.com/blank.html&'
-scope = 'scope=stats' 
-url_3 = '&response_type=token&v=5.62&state=123456'
-url = url_1 + client_id + url_2 + scope + url_3
-print "Copy to browser:\n%s\n", url
 
-access_link = raw_input("Enter access link: ")
-token = find_out_token(access_link)
+def create_group_info(group):
+	row =[]
+	row.append(group[u'gid'])
+	row.append(group[u'screen_name'])
+	row.append(group[u'type'])	
+	row.append(group[u'name'])
+	row.append(group[u'description'])
+	return row
+	
+token = open("token.txt").read()
+	
 vk = vkontakte.API(token=token)
 
-profiles = vk.groups.getMembers(group_id='122564943', count = 2)
+profiles = vk.groups.getMembers(group_id='122564943')
+
+data = []
 
 #get all user ids for group
 user_ids = ''
-group_list = []
+group_count = dict()
 for user in profiles[u'users']:
 	user_ids += (str(user) + ", ")
-	groups = vk.users.getSubscriptions(user_id=user, extended=1)
-	group_list.append(groups)
-
-user_info = vk.users.get(user_ids=user_ids, fields="home_town")
-
-fieldnames = create_fieldnames(user_info)
-data = []
-
-for item in user_info:
-	row = []
-	for key, value in item.iteritems():
-		row.append(value)
-	data.append(row)
-
-print group_list
+	print "Creating group list for user #", user
+	groups = vk.groups.get(user_id=user, extended = 1, fields = "description")
+	for group in groups[1:]:
+		row = create_group_info(group)
+		if row not in data:
+			data.append(row)
+			group_count[group[u'gid']] = 1
+		else:
+			group_count[group[u'gid']] += 1
+	time.sleep(0.2)
+print "Groups were counted"
 	
-#write_to_result('results.csv', data, fieldnames)	
+
+for key, value in group_count.iteritems():
+	for line in data:
+		if line[0] == key:
+			line.append(value)
+
+#		else:
+#			print "Can't find id %s in data" 
+
+fieldnames = ["ID", "Screen name", "Type", "Name", "Description","Count"]
+write_to_result('results.csv', data, fieldnames)	
