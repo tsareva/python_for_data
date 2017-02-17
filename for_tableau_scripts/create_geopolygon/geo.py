@@ -92,4 +92,4 @@ def create_data(districts):
 data = create_data(districts)
 			
 fieldnames = ["District", "Longitude", "Latitude", "Path"]
-write_to_result('spb_districts.csv', data, fieldnames)	
+write_to_result('karelia_districts.csv', data, fieldnames)	
