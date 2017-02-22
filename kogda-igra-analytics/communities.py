@@ -8,6 +8,8 @@ import codecs, csv
 import urllib, vkontakte, pprint
 import time
 
+group_id = '93967270'
+
 def get_profiles_from_group(group_id):
 	offset = 0
 	id_list = []
@@ -73,7 +75,7 @@ def get_personal(id_list):
 			time.sleep(0.2)
 		except:
 			x = 0
-			while x < 2:
+			while x < 6:
 				line.append("")
 				x+=1
 			pass
@@ -83,6 +85,22 @@ def get_personal(id_list):
 
 def create_personal_info(personal):
 	row = []
+	try:
+		row.append(personal[u'political'])
+	except:
+		row.append("")	
+	try:
+		row.append(personal[u'religion'])
+	except:
+		row.append("")	
+	try:
+		row.append(personal[u'people_main'])
+	except:
+		row.append("")	
+	try:
+		row.append(personal[u'life_main'])
+	except:
+		row.append("")	
 	try:
 		row.append(personal[u'alcohol'])
 	except:
@@ -105,19 +123,22 @@ def write_to_result(filename, data, fieldnames):
 		result_file.close()
 	else:
 		print "No data to be saved"
+
+def merge_data(profiles, personal_data):
+	for profile in profiles:
+		for line in personal_data:
+			if line[0] == profile[0]:
+				for element in line[1:]:
+					profile.append(element)
 		
 token = open("token.txt").read()
 vk = vkontakte.API(token=token)
 
-id_list, profiles = get_profiles_from_group('109407511')
+id_list, profiles = get_profiles_from_group(group_id)
 personal_data = get_personal(id_list)
 
-for profile in profiles:
-	for line in personal_data:
-		if line[0] == profile[0]:
-			for element in line[1:]:
-				profile.append(element)
+merge_data(profiles, personal_data)
 
-
-fieldnames = ["User ID", "First name", "Last name", "sex", "bdate", "city", "country", "alchohol", "smoking"]
-write_to_result("user_info.csv", profiles, fieldnames)
+filename = "users_info_" + group_id + ".csv"
+fieldnames = ["User ID", "First name", "Last name", "sex", "bdate", "city", "country", "political", "religion", "people_main", "life_main", "alchohol", "smoking"]
+write_to_result(filename, profiles, fieldnames)
