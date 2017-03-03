@@ -1,0 +1,75 @@
+CREATE TABLE Sex (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE Country (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE City (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE Political (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE People_main (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE Life_main (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE Alchohol (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+CREATE TABLE Smoking (
+	id INTEGER NOT NULL PRIMARY KEY,
+	value TEXT
+);
+
+INSERT INTO Sex(id, value) VALUES (1, 'женский');
+INSERT INTO Sex(id, value) VALUES (2, 'мужской');
+INSERT INTO Political(id, value) VALUES (1, 'коммунистические');
+INSERT INTO Political(id, value) VALUES (2, 'социалистические');
+INSERT INTO Political(id, value) VALUES (3, 'умеренные');
+INSERT INTO Political(id, value) VALUES (4, 'либеральные');
+INSERT INTO Political(id, value) VALUES (5, 'консервативные');
+INSERT INTO Political(id, value) VALUES (6, 'монархические');
+INSERT INTO Political(id, value) VALUES (7, 'ультраконсервативные');
+INSERT INTO Political(id, value) VALUES (8, 'индифферентные');
+INSERT INTO Political(id, value) VALUES (9, 'либертарианские');
+INSERT INTO People_main(id, value) VALUES (1, 'ум и креативность');
+INSERT INTO People_main(id, value) VALUES (2, 'доброта и честность');
+INSERT INTO People_main(id, value) VALUES (3, 'красота и здоровье');
+INSERT INTO People_main(id, value) VALUES (4, 'власть и богатство');
+INSERT INTO People_main(id, value) VALUES (5, 'смелость и упорство');
+INSERT INTO People_main(id, value) VALUES (6, 'юмор и жизнелюбие');
+INSERT INTO Life_main(id, value) VALUES (1, 'семья и дети');
+INSERT INTO Life_main(id, value) VALUES (2, 'карьера и деньги');
+INSERT INTO Life_main(id, value) VALUES (3, 'развлечения и отдых');
+INSERT INTO Life_main(id, value) VALUES (4, 'наука и исследования');
+INSERT INTO Life_main(id, value) VALUES (5, 'совершенствование мира');
+INSERT INTO Life_main(id, value) VALUES (6, 'саморазвитие');
+INSERT INTO Life_main(id, value) VALUES (7, 'красота и искусство');
+INSERT INTO Life_main(id, value) VALUES (8, 'слава и влияние');
+INSERT INTO Smoking(id, value) VALUES (1, 'резко негативное');
+INSERT INTO Smoking(id, value) VALUES (2, 'негативное');
+INSERT INTO Smoking(id, value) VALUES (3, 'компромиссное');
+INSERT INTO Smoking(id, value) VALUES (4, 'нейтральное');
+INSERT INTO Smoking(id, value) VALUES (5, 'положительное');
+INSERT INTO Alchohol(id, value) VALUES (1, 'резко негативное');
+INSERT INTO Alchohol(id, value) VALUES (2, 'негативное');
+INSERT INTO Alchohol(id, value) VALUES (3, 'компромиссное');
+INSERT INTO Alchohol(id, value) VALUES (4, 'нейтральное');
+INSERT INTO Alchohol(id, value) VALUES (5, 'положительное');

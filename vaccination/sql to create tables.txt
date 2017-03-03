@@ -1,0 +1,70 @@
+CREATE TABLE Users (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	uid INTEGER NOT NULL,
+	is_actual INTEGER,
+	date_actual INTEGER,
+	deactivated TEXT,
+	first_name TEXT,
+	last_name TEXT,
+	bdate TEXT,
+	sex INTEGER,
+	country INTEGER,
+	city INTEGER,
+	political INTEGER,
+	religion TEXT,
+	people_main INTEGER,
+	life_main INTEGER,
+	alchohol INTEGER,
+	smoking INTEGER,
+	have_child INTEGER
+);
+
+CREATE TABLE Groups (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	gid INTEGER NOT NULL,
+	is_actual INTEGER,
+	date_actual INTEGER,
+	name TEXT,
+	screen_name TEXT,
+	type TEXT,
+	is_closed INTEGER,
+	description TEXT
+);
+
+CREATE TABLE Links (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	lid INTEGER NOT NULL,
+	is_actual INTEGER,
+	date_actual INTEGER,
+	url TEXT,
+	name TEXT,
+	desc TEXT 
+);
+
+CREATE TABLE Contacts (
+	id INTEGER NOT NULL UNIQUE,
+	user_id INTEGER,
+	group_id INTEGER,
+	is_actual INTEGER,
+	date_actual INTEGER,
+	desc TEXT,
+	PRIMARY KEY (id, user_id, group_id)
+);
+
+CREATE TABLE Groups_members (
+	id INTEGER NOT NULL UNIQUE,
+	group_id INTEGER,
+	user_id INTEGER,
+	is_actual INTEGER,
+	date_actual INTEGER,
+	PRIMARY KEY (id, user_id, group_id)
+);
+
+CREATE TABLE Users_friends (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	user_id INTEGER,
+	friend_id INTEGER,
+	is_actual INTEGER,
+	date_actual INTEGER,
+	status TEXT(8)
+)
