@@ -291,7 +291,6 @@ def create_group_list_from_db():
 			group_ids.append(row[0])
 	return group_ids	
 
-id_with_no_info = []	
 group_id = '38532412' #vk.com/privivkanet
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
@@ -326,8 +325,8 @@ for id in users_group_ids:
 		user_id_list = get_user_id(id, user_count)
 		group_members_by_group_info(id, user_id_list)
 	x+=1
+
+print suspicios_groups
 	
 with open("groups.txt", "w") as text_file:
     text_file.write(suspicios_groups)
-with open("ids.txt", "w") as text_file:
-	text_file.write(id_with_no_info)
