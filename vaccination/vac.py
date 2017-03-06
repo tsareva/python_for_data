@@ -79,15 +79,16 @@ def get_user_info(user_id):
 			fields = "sex,bdate,city,country,personal,relatives,counters"
 			user_info = vk.users.get(user_ids=user_id, fields=fields)
 			time.sleep(0.2)
-			counter = user_info[0].get(u'counters', {u'friends': 0})
-			count = counter.get(u'friends',0)
 			try:
 				friend_list = vk.friends.get(user_id=user_id)
+				time.sleep(0.2)
 			except:
 				friend_list = []
-			time.sleep(0.2)
-			group_list = vk.groups.get(user_id=user_id)
-			time.sleep(0.2)
+			try:
+				group_list = vk.groups.get(user_id=user_id)
+				time.sleep(0.2)
+			except:
+				group_list = []
 			return user_info, friend_list, group_list
 		except:
 			print "Can't create connection for %s time. Trying again..." % x
