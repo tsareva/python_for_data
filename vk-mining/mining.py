@@ -4,17 +4,26 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 sys.path.append('files/')
-import get_group_info
+import group
+import write_to_db
+import time, sqlite3, vkontakte
+import pprint
 
-group_id = '38532412' #vk.com/privivkanet
+group_id = 'joinrpg' #vk.com/privivkanet
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
-connection = sqlite3.connect('vk_vaccination.db')
-cur = connection.cursor()
+#getting info about start group
+group_info, count, contacts, links = group.get_info(group_id)
+members_ids = group.get_members_ids(group_id, count)
 
-print "Connected to database\n * * * \n"
+#write_to_db.update_Groups_table(group_info)
 
-token = open("token.txt").read()
-vk = vkontakte.API(token=token)
+if len(contacts) > 0:
+	if len(raw_input("Update contacts? ")) > 0:
+		write_to_db.update_group_contacts(group_info, contacts)
+			
+if links is not None:
+	if len(raw_input("Update links? ")) > 0:
+		print "Update links?"
 
-raw_input(": ")
+write_to_db.commited()
