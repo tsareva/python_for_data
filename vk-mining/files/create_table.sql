@@ -4,7 +4,8 @@ DROP TABLE IF EXISTS Groups;
 DROP TABLE IF EXISTS Groups_members;
 DROP TABLE IF EXISTS Links;
 DROP TABLE IF EXISTS Users_friends;
-DROP TABLE IF EXISTS Group_list_members;
+DROP TABLE IF EXISTS Relatives;	
+DROP TABLE IF EXISTS Group_count;
 
 CREATE TABLE Users (
 	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
@@ -40,6 +41,7 @@ CREATE TABLE Groups (
 
 CREATE TABLE Links (
 	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	group_id INTEGER,
 	lid INTEGER NOT NULL,
 	is_actual INTEGER,
 	date_actual TEXT,
@@ -63,8 +65,11 @@ CREATE TABLE Groups_members (
 	user_id INTEGER,
 	is_actual INTEGER,
 	date_actual TEXT,
-	status TEXT
+	status TEXT,
+	source TEXT
 );
+
+CREATE INDEX Groups_members_gid ON Groups_members (group_id, user_id);
 
 CREATE TABLE Users_friends (
 	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
@@ -83,4 +88,11 @@ CREATE TABLE Relatives (
 	date_actual TEXT,
 	type TEXT(8),
 	name TEXT
-)
+);
+
+CREATE TABLE Group_count (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	group_id INTEGER,
+	date_actual TEXT,
+	count INTEGER
+);

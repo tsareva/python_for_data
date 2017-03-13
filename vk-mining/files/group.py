@@ -1,6 +1,6 @@
 #!/usr/bin/envquit() python
 # -*- coding: utf-8 -*-
-import sys
+import sys, socket, ssl
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import codecs, csv, sqlite3, urllib, vkontakte, time
@@ -20,9 +20,30 @@ def get_info(group_id):
 			contacts = all_group_info[0].get(u'contacts', None)
 			links = all_group_info[0].get(u'links', None)
 			return group_info, count, contacts, links
-		except:
+		except (socket.gaierror, ssl.SSLError):
+			print "Can't create connection for %s time. Trying again..." % x
+			time.sleep(1)
+			x+=1
 			continue
 
+def get_info_for_many_groups(str_group_ids):
+	offset = 0
+	count = 0
+	many_group_info = []
+	fields='members_count,description,contacts,links'
+	while (count < len(str_group_ids)):
+		try:
+			new_info = vk.groups.getById(group_ids=group_id, fields=fields, offset=offset)
+			many_group_info+=new_info
+			count+=len(new_info)
+			print "Getting info for %s of %s groups" % (count, len(str_group_ids))
+			offset += 1000
+			time.sleep(0.2)
+		except:
+			time.sleep(0.2)
+			continue
+	return many_group_info			
+			
 def create_group_info_dict(all_group_info):
 	group_info = dict()
 	group_info[u'gid'] = all_group_info[0].get(u'gid', "")	
@@ -47,4 +68,33 @@ def get_members_ids(group_id, count):
 			time.sleep(0.2)
 			continue
 	return id_list
+	
+def create_memberships(members_ids, group_id, source):
+	memberships = []
+	for id in members_ids:
+		member = (group_id, id, source)
+		memberships.append(member)
+	return memberships
+
+def get_groups_for_users(user_id):
+	try:
+		group_list = vk.groups.get(user_id=user_id)
+		time.sleep(0.2)
+		return group_list
+	except:
+		group_list = []
+		return group_list
+
+def create_all_groups_from_users(members_ids):		
+	all_groups_from_users = []
+	u = 1
+	for user_id in members_ids:
+		print "Getting info about groups for %s of %s" % (u, len(members_ids))
+		group_list = get_groups_for_users(user_id)
+		user = [user_id]
+		for group_id in group_list:
+			groups = create_memberships(user, group_id, "user info")
+			all_groups_from_users += groups
+		u+=1
+	return all_groups_from_users
 	

@@ -41,7 +41,12 @@ def add_group_to_db(group_info):
 		''', (group_info[u'gid'], "1", current_date, group_info[u'name'],  
 				group_info[u'screen_name'], group_info[u'type'], 
 				group_info[u'is_closed'], group_info['description']))
-	print "Add info about group %s into database" % group_info[u'uid']
+	print "Add info about group %s into database" % group_info[u'gid']
+
+def add_group_count(group_id, count):
+	cur.execute('''
+		INSERT OR IGNORE INTO Group_count (group_id, date_actual, count) 
+		VALUES ( ?, ?, ? )''', (group_id, current_date, count))	
 	
 def update_Groups_table(group_info):
 	#add info about group to database
@@ -76,13 +81,62 @@ def check_if_contact_actual(gid, contact):
 				WHERE group_id = ( ? ) AND user_id = ( ? ) 
 				AND is_actual = 1''', (gid, contact[u'user_id']))
 			return False
-	
 		
 def update_group_contacts(group_info, contacts):
 	gid = group_info[u'gid']
 	for contact in contacts:
-		if check_if_contact_actual(gid, contact) is True:
+		if check_if_contact_actual(gid, contact) is False:
 			add_group_contact(gid, contact)
 
+def add_group_link(gid, link):
+	cur.execute('''
+		INSERT OR IGNORE INTO Links (group_id, lid, is_actual, 
+		date_actual, url, name, desc) 
+		VALUES ( ?, ?, ?, ?, ?, ?, ? )
+		''', (gid, link[u'id'], "1", current_date, link[u'url'], link[u'name'], link[u'desc']))
+
+def check_if_link_actual(gid, link):
+	cur.execute('''SELECT * FROM Links 
+		WHERE group_id = ( ? ) AND lid = ( ? ) 
+		AND is_actual = 1''', (gid, link[u'id']))
+	row = cur.fetchone()
+	if row is None:
+		return False
+	else:
+		if (link[u'url'] == row[5] and link[u'name'] == row[6] and link[u'desc'] == row[7]):
+			return True
+		else:
+			cur.execute('''UPDATE Links SET is_actual = 0
+				WHERE group_id = ( ? ) AND lid = ( ? ) 
+				AND is_actual = 1''', (gid, link[u'id']))
+			return False
+		
+def update_group_links(group_info, links):
+	gid = group_info[u'gid']
+	for link in links:
+		if check_if_link_actual(gid, link) is False:
+			add_group_link(gid, link)			
+
+def add_group_member(member):
+	cur.execute('''
+		INSERT OR IGNORE INTO Groups_members (group_id, user_id, is_actual, 
+		date_actual, status, source) VALUES ( ?, ?, ?, ?, ?, ? )''', 
+		(member[0], member[1], "1", current_date, "member", member[2]))
+
+def compare_groups_with_db(memberships):
+	for member in memberships:
+		cur.execute('''SELECT group_id, user_id, source FROM Groups_members 
+			WHERE group_id = ( ? ) AND user_id = ( ? ) AND source = ( ? ) AND is_actual = 1''', 
+			(member[0], member[1], member[2]))
+		row = cur.fetchone()
+		if row is None:
+			add_group_member(member)
+			
+def select_unique_groups_from_db():
+	group_list = []
+	for row in cur.execute('''SELECT DISTINCT group_id FROM Groups_members'''):
+		group_list.append(row[0])
+	return group_list
+				
 def commited():
 	connection.commit()
