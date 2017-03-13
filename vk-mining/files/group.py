@@ -15,10 +15,11 @@ def get_info(group_id):
 			print "Getting data for group ", group_id
 			fields='members_count,description,contacts,links'
 			all_group_info = vk.groups.getById(group_ids=group_id, fields=fields)
+			all_group_info = all_group_info[0]
 			group_info = create_group_info_dict(all_group_info)
-			count = all_group_info[0].get(u'members_count', None)
-			contacts = all_group_info[0].get(u'contacts', None)
-			links = all_group_info[0].get(u'links', None)
+			count = all_group_info.get(u'members_count', None)
+			contacts = all_group_info.get(u'contacts', None)
+			links = all_group_info.get(u'links', None)
 			return group_info, count, contacts, links
 		except (socket.gaierror, ssl.SSLError):
 			print "Can't create connection for %s time. Trying again..." % x
@@ -26,32 +27,44 @@ def get_info(group_id):
 			x+=1
 			continue
 
-def get_info_for_many_groups(str_group_ids):
-	offset = 0
-	count = 0
+def get_info_for_many_groups(groups_from_db):
+	x = 1
+	s = 0
+	e = 150
 	many_group_info = []
+	print "Getting data for %s groups" % len(groups_from_db)
 	fields='members_count,description,contacts,links'
-	while (count < len(str_group_ids)):
+	while (len(groups_from_db) > len(many_group_info)):
 		try:
-			new_info = vk.groups.getById(group_ids=group_id, fields=fields, offset=offset)
+			group_ids = ','.join(str(e) for e in groups_from_db[s:e])
+			new_info = vk.groups.getById(group_ids=group_ids, fields=fields)
 			many_group_info+=new_info
-			count+=len(new_info)
-			print "Getting info for %s of %s groups" % (count, len(str_group_ids))
-			offset += 1000
+			print "Getting info for %s of %s groups" % (len(many_group_info), len(groups_from_db))
+			s += 150
+			e += 150
 			time.sleep(0.2)
-		except:
-			time.sleep(0.2)
+		except (socket.gaierror, ssl.SSLError):
+			print "Can't create connection for %s time. Trying again..." % x
+			time.sleep(1)
+			x+=1
 			continue
 	return many_group_info			
 			
+def reshape_info_from_many_groups(all_group_info):
+	group_info = create_group_info_dict(all_group_info)
+	count = all_group_info.get(u'members_count', None)
+	contacts = all_group_info.get(u'contacts', None)
+	links = all_group_info.get(u'links', None)
+	return group_info, count, contacts, links
+			
 def create_group_info_dict(all_group_info):
 	group_info = dict()
-	group_info[u'gid'] = all_group_info[0].get(u'gid', "")	
-	group_info[u'name'] = all_group_info[0].get(u'name', "")
-	group_info[u'screen_name'] = all_group_info[0].get(u'screen_name', "")	
-	group_info[u'type'] = all_group_info[0].get(u'type', "")	
-	group_info[u'is_closed'] = all_group_info[0].get(u'is_closed', "")		
-	group_info[u'description'] = all_group_info[0].get(u'description', "")
+	group_info[u'gid'] = all_group_info.get(u'gid', "")	
+	group_info[u'name'] = all_group_info.get(u'name', "")
+	group_info[u'screen_name'] = all_group_info.get(u'screen_name', "")	
+	group_info[u'type'] = all_group_info.get(u'type', "")	
+	group_info[u'is_closed'] = all_group_info.get(u'is_closed', "")		
+	group_info[u'description'] = all_group_info.get(u'description', "")
 	return group_info
 	
 def get_members_ids(group_id, count):

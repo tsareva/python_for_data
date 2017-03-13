@@ -56,7 +56,9 @@ CREATE TABLE Contacts (
 	group_id INTEGER,
 	is_actual INTEGER,
 	date_actual TEXT,
-	desc TEXT
+	desc TEXT,
+	phone TEXT,
+	email TEXT
 );
 
 CREATE TABLE Groups_members (

@@ -44,9 +44,12 @@ def add_group_to_db(group_info):
 	print "Add info about group %s into database" % group_info[u'gid']
 
 def add_group_count(group_id, count):
-	cur.execute('''
-		INSERT OR IGNORE INTO Group_count (group_id, date_actual, count) 
-		VALUES ( ?, ?, ? )''', (group_id, current_date, count))	
+	q = cur.execute('''SELECT * FROM Group_count 
+		WHERE group_id = ( ? ) and count = ( ? )''', (group_id, count ))
+	if q.fetchone() is None:
+		cur.execute('''
+			INSERT OR IGNORE INTO Group_count (group_id, date_actual, count) 
+			VALUES ( ?, ?, ? )''', (group_id, current_date, count))	
 	
 def update_Groups_table(group_info):
 	#add info about group to database
@@ -62,31 +65,37 @@ def update_Groups_table(group_info):
 def add_group_contact(gid, contact):
 	cur.execute('''
 		INSERT OR IGNORE INTO Contacts (group_id, user_id, is_actual, 
-		date_actual, desc) 
-		VALUES ( ?, ?, ?, ?, ? )
-		''', (gid, contact[u'user_id'], "1", current_date, contact[u'desc']))
+		date_actual, desc, phone, email) 
+		VALUES ( ?, ?, ?, ?, ?, ?, ? )''', 
+		(gid, contact.get(u'user_id', ""), "1", current_date, 
+			contact.get(u'desc', ""), contact.get(u'phone', ""), 
+			contact.get(u'email', "")))
 
 def check_if_contact_actual(gid, contact):
 	cur.execute('''SELECT * FROM Contacts 
 		WHERE group_id = ( ? ) AND user_id = ( ? ) 
-		AND is_actual = 1''', (gid, contact[u'user_id']))
+		AND is_actual = 1''', (gid, contact.get(u'user_id', "")))
 	row = cur.fetchone()
 	if row is None:
 		return False
 	else:
-		if contact[u'desc'] == row[5]:
+		if (contact.get(u'desc', "") == row[5] and contact.get(u'phone', "") == row[6]
+				and contact.get(u'email', "") == row[7]):
 			return True
 		else:
 			cur.execute('''UPDATE Contacts SET is_actual = 0
 				WHERE group_id = ( ? ) AND user_id = ( ? ) 
-				AND is_actual = 1''', (gid, contact[u'user_id']))
+				AND is_actual = 1''', (gid, contact.get(u'user_id', "")))
 			return False
 		
 def update_group_contacts(group_info, contacts):
 	gid = group_info[u'gid']
-	for contact in contacts:
-		if check_if_contact_actual(gid, contact) is False:
-			add_group_contact(gid, contact)
+	if contacts is None:
+		pass
+	else:
+		for contact in contacts:
+			if check_if_contact_actual(gid, contact) is False:
+				add_group_contact(gid, contact)
 
 def add_group_link(gid, link):
 	cur.execute('''
@@ -113,9 +122,12 @@ def check_if_link_actual(gid, link):
 		
 def update_group_links(group_info, links):
 	gid = group_info[u'gid']
-	for link in links:
-		if check_if_link_actual(gid, link) is False:
-			add_group_link(gid, link)			
+	if links is None:
+		pass
+	else:
+		for link in links:
+			if check_if_link_actual(gid, link) is False:
+				add_group_link(gid, link)			
 
 def add_group_member(member):
 	cur.execute('''
