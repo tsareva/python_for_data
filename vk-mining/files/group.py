@@ -4,6 +4,8 @@ import sys, socket, ssl
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import codecs, csv, sqlite3, urllib, vkontakte, time
+from create_token import create_token
+
 
 token = open("files/token.txt").read()
 vk = vkontakte.API(token=token)
@@ -26,7 +28,11 @@ def get_info(group_id):
 			time.sleep(1)
 			x+=1
 			continue
-
+		except vkontakte.api.VKError as error:
+			if error.code == 5:
+				create_token()
+			continue
+			
 def get_info_for_many_groups(groups_from_db):
 	x = 1
 	s = 0

@@ -33,13 +33,18 @@ if len(raw_input("Get info about groups in which members of start group are?")) 
 groups_from_db = write_to_db.select_unique_groups_from_db()
 many_group_info = group.get_info_for_many_groups(groups_from_db)
 
-for all_group_info in many_group_info[:100000]:
+n = 0
+for all_group_info in many_group_info:
 	group_info, count, contacts, links = group.reshape_info_from_many_groups(all_group_info)
 	group_id = group_info[u'gid']
 	write_to_db.add_group_count(group_id, count)
 	write_to_db.update_Groups_table(group_info)
 	write_to_db.update_group_contacts(group_info, contacts)
 	write_to_db.update_group_links(group_info, links)
+	n +=1
+	if n > 10000:
+		n = 0
+		write_to_db.commited()
 write_to_db.commited()
 	
 #if len(contacts) > 0:
