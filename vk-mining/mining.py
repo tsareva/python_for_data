@@ -6,10 +6,11 @@ sys.setdefaultencoding('utf-8')
 sys.path.append('files/')
 import group
 import write_to_db
+import messages
 import time, sqlite3, vkontakte
 import pprint
 
-group_id = '38532412' #vk.com/privivkanet
+group_id = 'joinrpg' #vk.com/privivkanet
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
 #getting info about start group
@@ -31,27 +32,27 @@ if len(raw_input("Get info about groups in which members of start group are?")) 
 	write_to_db.commited()
 
 groups_from_db = write_to_db.select_unique_groups_from_db()
-many_group_info = group.get_info_for_many_groups(groups_from_db)
+print "There are %s groups in database" % len(groups_from_db)
 
-n = 0
-for all_group_info in many_group_info:
-	group_info, count, contacts, links = group.reshape_info_from_many_groups(all_group_info)
-	group_id = group_info[u'gid']
-	write_to_db.add_group_count(group_id, count)
-	write_to_db.update_Groups_table(group_info)
-	write_to_db.update_group_contacts(group_info, contacts)
-	write_to_db.update_group_links(group_info, links)
-	n +=1
-	if n > 10000:
-		n = 0
-		write_to_db.commited()
-write_to_db.commited()
+s = 0
+e = 10000
+if len(groups_from_db) > 1:
+	if len(raw_input("Get profiles for all groups?")) > 0:
+		l = 0
+		while (e-10000) < len(groups_from_db):
+			many_group_info = group.get_info_for_many_groups(groups_from_db[s:e])
+			for all_group_info in many_group_info:
+				group_info, count, contacts, links = group.reshape_info_from_many_groups(all_group_info)
+				group_id = group_info[u'gid']
+				write_to_db.add_group_count(group_id, count)
+				write_to_db.update_Groups_table(group_info)
+				write_to_db.update_group_contacts(group_info, contacts)
+				write_to_db.update_group_links(group_info, links)
+			s+=10000
+			e+=10000
+			l+=10000
+			print "%s of %s done" % (l, len(groups_from_db))
+			write_to_db.commited()
 	
-#if len(contacts) > 0:
-#	if len(raw_input("Update contacts? ")) > 0:
-#		None
-			
-#if links is not None:
-#	if len(raw_input("Update links? ")) > 0:
-#		None
+
 

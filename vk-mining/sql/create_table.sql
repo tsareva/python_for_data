@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS Links;
 DROP TABLE IF EXISTS Users_friends;
 DROP TABLE IF EXISTS Relatives;	
 DROP TABLE IF EXISTS Group_count;
+DROP TABLE IF EXISTS Messages;
+DROP TABLE IF EXISTS Messages_stats;
 
 CREATE TABLE Users (
 	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
@@ -39,6 +41,8 @@ CREATE TABLE Groups (
 	description TEXT
 );
 
+CREATE INDEX Groups_gid ON Groups(gid);
+
 CREATE TABLE Links (
 	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
 	group_id INTEGER,
@@ -50,6 +54,8 @@ CREATE TABLE Links (
 	desc TEXT 
 );
 
+CREATE INDEX Links_gid ON Links(group_id);
+
 CREATE TABLE Contacts (
 	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
 	user_id INTEGER,
@@ -60,6 +66,8 @@ CREATE TABLE Contacts (
 	phone TEXT,
 	email TEXT
 );
+
+CREATE INDEX Contacts_gid ON Contacts(group_id);
 
 CREATE TABLE Groups_members (
 	id INTEGER NOT NULL PRIMARY KEY  UNIQUE,
@@ -97,4 +105,31 @@ CREATE TABLE Group_count (
 	group_id INTEGER,
 	date_actual TEXT,
 	count INTEGER
+);
+
+CREATE INDEX Group_count_gid ON Group_count (group_id);
+
+CREATE TABLE Messages (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	mid INTEGER,
+	from_id INTEGER,
+	signer_id INTEGER,
+	to_id INTEGER,
+	date TEXT,
+	text TEXT,
+	marked_as_ads INTEGER
+	is_actual INTEGER,
+	date_actual TEXT
+);
+
+CREATE TABLE Messages_stats (
+	id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+	mid INTEGER,
+	to_id INTEGER,
+	reposts_count INTEGER,
+	likes_count INTEGER,
+	comments INTEGER,
+	is_pinned INTEGER,
+	is_actual INTEGER,
+	date_actual TEXT
 );

@@ -23,7 +23,7 @@ def get_info(group_id):
 			contacts = all_group_info.get(u'contacts', None)
 			links = all_group_info.get(u'links', None)
 			return group_info, count, contacts, links
-		except (socket.gaierror, ssl.SSLError):
+		except (socket.gaierror, socket.timeout, ssl.SSLError):
 			print "Can't create connection for %s time. Trying again..." % x
 			time.sleep(1)
 			x+=1
@@ -49,7 +49,7 @@ def get_info_for_many_groups(groups_from_db):
 			s += 150
 			e += 150
 			time.sleep(0.2)
-		except (socket.gaierror, ssl.SSLError):
+		except (socket.gaierror, socket.timeout, ssl.SSLError):
 			print "Can't create connection for %s time. Trying again..." % x
 			time.sleep(1)
 			x+=1

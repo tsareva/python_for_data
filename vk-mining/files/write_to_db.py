@@ -5,12 +5,13 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import sqlite3, time
 
-connection = sqlite3.connect('vk_vaccination.db')
+connection = sqlite3.connect('jrpg.db')
 cur = connection.cursor()
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
 print "Connected to database\n * * * \n"
 
+#for groups info
 def check_if_group_exist(group_info):
 	gid = group_info[u'gid']
 	q = cur.execute('''SELECT * FROM Groups WHERE gid = ( ? )''', (gid, ))
@@ -61,7 +62,8 @@ def update_Groups_table(group_info):
 			cur.execute('''UPDATE Groups SET is_actual = 0 WHERE gid = ( ? ) 
 				and is_actual = 1''', (group_info[u'gid'], ))
 			add_group_to_db(group_info)
-	
+
+#for groups contacts			
 def add_group_contact(gid, contact):
 	cur.execute('''
 		INSERT OR IGNORE INTO Contacts (group_id, user_id, is_actual, 
@@ -97,6 +99,7 @@ def update_group_contacts(group_info, contacts):
 			if check_if_contact_actual(gid, contact) is False:
 				add_group_contact(gid, contact)
 
+#for groups liks			
 def add_group_link(gid, link):
 	cur.execute('''
 		INSERT OR IGNORE INTO Links (group_id, lid, is_actual, 
@@ -129,6 +132,7 @@ def update_group_links(group_info, links):
 			if check_if_link_actual(gid, link) is False:
 				add_group_link(gid, link)			
 
+#for groups members
 def add_group_member(member):
 	cur.execute('''
 		INSERT OR IGNORE INTO Groups_members (group_id, user_id, is_actual, 
@@ -143,7 +147,25 @@ def compare_groups_with_db(memberships):
 		row = cur.fetchone()
 		if row is None:
 			add_group_member(member)
-			
+
+#for messages
+def add_message(message):
+	cur.execute('''
+		INSERT OR IGNORE INTO Messages (mid, signer_id, from_id, to_id, date, text,
+		marked_as_ads, is_actual, date_actual) 
+		VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )''', 
+		(post_dict[u'id'], post_dict[u'signer_id'], post_dict[u'from_id'],
+		post_dict[u'to_id'], post_dict[u'date'], post_dict[u'text'],
+		post_dict[u'marked_as_ads'], "1", current_date))
+	cur.execute('''
+		INSERT OR IGNORE INTO Messages_stats (mid, to_id, reposts_count, likes_count,
+		comments, is_pinned, is_actual, date_actual) 
+		VALUES ( ?, ?, ?, ?, ?, ?, ?, ?  )''', 
+		(post_dict[u'id'], post_dict[u'to_id'], post_dict[u'reposts count'],
+		post_dict[u'likes count'], post_dict[u'comments'], post_dict[u'is_pinned'],
+		"1", current_date))
+		
+#general
 def select_unique_groups_from_db():
 	group_list = []
 	for row in cur.execute('''SELECT DISTINCT group_id FROM Groups_members'''):
