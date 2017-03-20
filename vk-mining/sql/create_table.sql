@@ -119,7 +119,8 @@ CREATE TABLE Messages (
 	text TEXT,
 	marked_as_ads INTEGER
 	is_actual INTEGER,
-	date_actual TEXT
+	date_actual TEXT,
+	deleted INTEGER
 );
 
 CREATE TABLE Messages_stats (

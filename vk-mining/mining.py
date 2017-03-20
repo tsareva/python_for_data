@@ -43,8 +43,8 @@ if len(groups_from_db) > 1:
 			many_group_info = group.get_info_for_many_groups(groups_from_db[s:e])
 			for all_group_info in many_group_info:
 				group_info, count, contacts, links = group.reshape_info_from_many_groups(all_group_info)
-				group_id = group_info[u'gid']
-				write_to_db.add_group_count(group_id, count)
+				group_id_from_db = group_info[u'gid']
+				write_to_db.add_group_count(group_id_from_db, count)
 				write_to_db.update_Groups_table(group_info)
 				write_to_db.update_group_contacts(group_info, contacts)
 				write_to_db.update_group_links(group_info, links)
@@ -53,6 +53,16 @@ if len(groups_from_db) > 1:
 			l+=10000
 			print "%s of %s done" % (l, len(groups_from_db))
 			write_to_db.commited()
+
+posts = messages.get_wall_messages(group_id)
+for post in posts[:10]:
+	post_dict = messages.get_message_info(posts)
+	write_to_db.update_message(post_dict)
+write_to_db.commited()
 	
 
 
+#messages_list = write_to_db.select_messages_id()
+#g_id = group_id * (-1)
+#comments = messages.get_comments(g_id, messages_list[1])
+#print type(comments[1])

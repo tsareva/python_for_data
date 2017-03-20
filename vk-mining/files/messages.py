@@ -3,7 +3,7 @@
 import sys, socket, ssl
 reload(sys)
 sys.setdefaultencoding('utf-8')
-import codecs, csv, sqlite3, urllib, vkontakte, time
+import codecs, csv, sqlite3, urllib, vkontakte, time, pprint
 
 token = open("files/token.txt").read()
 vk = vkontakte.API(token=token)
@@ -18,33 +18,55 @@ vk = vkontakte.API(token=token)
 
 
 def get_wall_messages(group_id):
-	wall = vk.wall.get(owner_id=("-"+group_id), count=90)
-	count = wall[0] #число постов на стене всего
-	offset = 90
+	if type(group_id) is int:
+		group_id = str(group_id)
+	wall = []
+	while len(wall) is 0:
+		try:
+			wall = vk.wall.get(owner_id=("-"+group_id), count=90)
+			count = wall[0]
+			time.sleep(0.2)
+		except (socket.gaierror, socket.timeout, ssl.SSLError):
+			print "Can't get info. Trying again..." 
+			time.sleep(0.2)
+			continue	
+	print "There are %s posts at group wall" % count
+	offset = 0
 	posts = []
-	posts += wall[1:]
-	while (count > len(id_list)):
+	while (count > len(posts)):
 		try:
 			wall = vk.wall.get(owner_id=("-"+group_id), count=90, offset=offset)
-			print "Getting posts: %s of %s done" % (len(id_list), count)
 			offset += 90
+			posts+=wall[1:]
+			print "Getting posts: %s of %s done" % (len(posts), count)
 			time.sleep(0.2)
-		except:
+		except (socket.gaierror, socket.timeout, ssl.SSLError):
+			print "Can't get info. Trying again..." 
 			time.sleep(0.2)
 			continue
 	return posts
 
 def get_message_info(post):
+	print type(post)
+	if post.get(u'post_type', None) is None:
+		get_original(post)
+
+
+def get_original(post):
 	post_dict = dict()
 	post_dict[u'id'] = post.get(u'id', "")
 	post_dict[u'from_id'] = post.get(u'from_id', "")
-	post_dict[u'signer_id'] = post.get(u'signer_id', "")	
+	post_dict[u'signer_id'] = post.get(u'signer_id', "")
 	post_dict[u'to_id'] = post.get(u'to_id', "")
 	post_dict[u'date'] = post.get(u'date', "")	
-	post_dict[u'text'] = post.get(u'text', "")
-	post_dict[u'reposts count'] = post[u'reposts'].get(u'count', 0)
-	post_dict[u'likes count'] = post[u'likes'].get(u'count', 0)
+	post_dict[u'text'] = post.get(u'text', "").decode('utf-8')
+	post_dict[u'reposts_count'] = post[u'reposts'].get(u'count', 0)
+	post_dict[u'likes_count'] = post[u'likes'].get(u'count', 0)
 	post_dict[u'comments'] = post[u'comments'].get(u'count', 0)
 	post_dict[u'marked_as_ads'] = post.get(u'marked_as_ads')
-	post_dict[u'is_pinned'] = post.get(u'is_pinned')
+	post_dict[u'is_pinned'] = post.get(u'is_pinned', 0)
 	return post_dict
+
+def get_comments(group_id, post_id):
+	comments = vk.wall.getComments(owner_id=group_id, post_id=post_id,need_likes=1)
+	return comments

@@ -31,7 +31,7 @@ def get_info(group_id):
 		except vkontakte.api.VKError as error:
 			if error.code == 5:
 				create_token()
-			continue
+				quit()
 			
 def get_info_for_many_groups(groups_from_db):
 	x = 1

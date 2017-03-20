@@ -149,21 +149,31 @@ def compare_groups_with_db(memberships):
 			add_group_member(member)
 
 #for messages
-def add_message(message):
+def add_message(post_dict):
 	cur.execute('''
-		INSERT OR IGNORE INTO Messages (mid, signer_id, from_id, to_id, date, text,
+		INSERT OR IGNORE INTO Messages (mid, from_id, signer_id, to_id, unix_date, text,
 		marked_as_ads, is_actual, date_actual) 
-		VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )''', 
-		(post_dict[u'id'], post_dict[u'signer_id'], post_dict[u'from_id'],
+		VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )''', 
+		(post_dict[u'id'], post_dict[u'from_id'], post_dict.get(u'signer_id', ""),
 		post_dict[u'to_id'], post_dict[u'date'], post_dict[u'text'],
 		post_dict[u'marked_as_ads'], "1", current_date))
+		
+def add_message_stats(post_dict):
 	cur.execute('''
 		INSERT OR IGNORE INTO Messages_stats (mid, to_id, reposts_count, likes_count,
 		comments, is_pinned, is_actual, date_actual) 
-		VALUES ( ?, ?, ?, ?, ?, ?, ?, ?  )''', 
-		(post_dict[u'id'], post_dict[u'to_id'], post_dict[u'reposts count'],
-		post_dict[u'likes count'], post_dict[u'comments'], post_dict[u'is_pinned'],
+		VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )''', 
+		(post_dict[u'id'], post_dict[u'to_id'], post_dict[u'reposts_count'],
+		post_dict[u'likes_count'], post_dict[u'comments'], post_dict[u'is_pinned'],
 		"1", current_date))
+
+def update_message(post_dict):
+	q = cur.execute('''
+			SELECT mid, to_id, text FROM Messages WHERE mid = ( ? ) AND to_id = ( ? ) AND text = ( ? ) ''', 
+			(post_dict[u'id'], post_dict[u'to_id'], post_dict[u'text'])) 
+	if q.fetchone() is None:
+		add_message(post_dict)
+		add_message_stats(post_dict)
 		
 #general
 def select_unique_groups_from_db():
@@ -171,6 +181,12 @@ def select_unique_groups_from_db():
 	for row in cur.execute('''SELECT DISTINCT group_id FROM Groups_members'''):
 		group_list.append(row[0])
 	return group_list
-				
+
+def select_messages_id():
+	messages_list = []
+	for row in cur.execute('''SELECT DISTINCT mid FROM Messages'''):
+		messages_list.append(row[0])
+	return messages_list
+	
 def commited():
 	connection.commit()
