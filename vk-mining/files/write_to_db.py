@@ -5,7 +5,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import sqlite3, time
 
-connection = sqlite3.connect('jrpg.db')
+connection = sqlite3.connect('vk_vaccination.db')
 cur = connection.cursor()
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 

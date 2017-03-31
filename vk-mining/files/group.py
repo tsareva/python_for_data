@@ -32,6 +32,15 @@ def get_info(group_id):
 			if error.code == 5:
 				create_token()
 				quit()
+			elif error.code == 100:
+				group_info = None 
+				count = None 
+				contacts = None 
+				links = None 
+				return group_info, count, contacts, links
+			else:
+				print error
+				quit()
 			
 def get_info_for_many_groups(groups_from_db):
 	x = 1

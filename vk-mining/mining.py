@@ -10,7 +10,7 @@ import messages
 import time, sqlite3, vkontakte
 import pprint
 
-group_id = 'joinrpg' #vk.com/privivkanet
+group_id = 'privivkanet' #vk.com/privivkanet
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
 #getting info about start group
