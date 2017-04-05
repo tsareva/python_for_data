@@ -75,6 +75,7 @@ def get_n_repost(group_id, mid):
 	time.sleep(0.2)
 	if start_m[1][u'id'] <> int(mid):
 		print "Check post id!"
+		print start_m[1][u'id']
 		quit()
 	n_repost = start_m[1][u'reposts'][u'count']
 	return n_repost
@@ -93,7 +94,7 @@ def get_repost_data(reposts):
 def get_post_data(post):
 	try:
 		line = []
-		line.append(post[u'copy_post_date'])
+		line.append(post[u'date'])
 		line.append(datetime.datetime.fromtimestamp(int(post[u'copy_post_date'])).strftime('%Y-%m-%d %H:%M:%S'))
 		line.append(post[u'id'])
 		line.append(post[u'from_id'])

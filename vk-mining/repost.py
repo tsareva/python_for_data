@@ -7,15 +7,8 @@ sys.path.append('files/')
 import group
 import messages
 import time, sqlite3, vkontakte
-import codecs, csv
-
-def write_to_result (filename, data, fieldnames):
-	result_file = codecs.open(filename, "wb", "utf-8-sig")
-	writer = csv.writer(result_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_ALL)
-	writer.writerow(fieldnames)
-	for row in data:
-		writer.writerow(row)
-	result_file.close()
+import work_with_csv
+import pprint
 
 def get_r_count(data):
 	r_count = 0
@@ -23,18 +16,26 @@ def get_r_count(data):
 		r_count += line[6]
 	return r_count
 
-n_repost = messages.get_n_repost("-19732513", "235977")	
+id = "-18901857" # should be with - for groups
+message_id = "778365"
+
+n_repost = 0 #messages.get_n_repost(id, message_id)	
 print "There are %s reposts of original message" % n_repost
 
-fieldnames = ["unixdate", "date", "m_id", "from_user", "source", "likes count", "repost count", "copy_text", "reposter type", "depth"]
+fieldnames = ["unixdate", "date", "m_id", "from_user", "source", "likes count", "repost count", "copy_text", "reposter type"]
 data = []
 offset=0
-while len(data)-2 < 455:
-	reposts = messages.get_reposts("-19732513", "235977", offset)
+get_data = ["Start with it"]
+while len(get_data) <> 0:
+	reposts = messages.get_reposts(id, message_id, offset)
 	get_data = messages.get_repost_data(reposts)
-	data+=get_data
+	for line in get_data:
+		if line not in data:
+			data.append(line)
 	print "Get %s of %s reposts" % (len(data), n_repost)
 	offset+=150
 
 
-write_to_result("r.csv", data, fieldnames)
+
+result_filename = str(id)+"-message"+str(message_id)+"-reposts.csv"
+work_with_csv.write_to_result(result_filename, data, fieldnames)
