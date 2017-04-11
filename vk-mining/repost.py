@@ -16,8 +16,8 @@ def get_r_count(data):
 		r_count += line[6]
 	return r_count
 
-id = "-18901857" # should be with - for groups
-message_id = "778365"
+id = raw_input("Enter id (hould be with - for groups)") # should be with - for groups
+message_id = raw_input("Enter message id") 
 
 n_repost = 0 #messages.get_n_repost(id, message_id)	
 print "There are %s reposts of original message" % n_repost
