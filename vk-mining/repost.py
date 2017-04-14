@@ -6,36 +6,44 @@ sys.setdefaultencoding('utf-8')
 sys.path.append('files/')
 import group
 import messages
-import time, sqlite3, vkontakte
+import time, sqlite3, vkontakte, time
 import work_with_csv
 import pprint
 
-def get_r_count(data):
-	r_count = 0
-	for line in data:
-		r_count += line[6]
-	return r_count
-
-id = raw_input("Enter id (hould be with - for groups)") # should be with - for groups
-message_id = raw_input("Enter message id") 
-
-n_repost = 0 #messages.get_n_repost(id, message_id)	
-print "There are %s reposts of original message" % n_repost
+group_id = "-19732513" #raw_input("Enter id (hould be with - for groups): ") # should be with - for groups
+message_id = "235977"#raw_input("Enter message id: ") 
 
 fieldnames = ["unixdate", "date", "m_id", "from_user", "source", "likes count", "repost count", "copy_text", "reposter type"]
-data = []
-offset=0
-get_data = ["Start with it"]
-while len(get_data) <> 0:
-	reposts = messages.get_reposts(id, message_id, offset)
-	get_data = messages.get_repost_data(reposts)
-	for line in get_data:
-		if line not in data:
-			data.append(line)
-	print "Get %s of %s reposts" % (len(data), n_repost)
-	offset+=150
+
+data = messages.get_all_reposts(group_id, message_id)
+
+reposter_list = []
+for row in data:
+	if row[6] > 0:
+		#repost = post id, user id
+		repost = (row[2], row[3])
+		if repost not in reposter_list:
+			reposter_list.append(repost)
+		
+rfr_data = []		
+for reposter in reposter_list:
+	time.sleep(0.2)
+	print "Look for reposts from ", reposter[1]
+	repost_data = messages.get_all_reposts(reposter[1], reposter[0]) 
+	if len(repost_data) > 0:
+		row[4] = reposter[1]
+	rfr_data+=repost_data
+
+not_found = []
+for line in rfr_data:
+	for row in data:
+		if str(row[2]) == str(line[2]) and str(row[3]) == str(line[3]):
+			row[4] = str(line[4])
+		else: 
+			if line not in not_found:
+				not_found.append(line)
 
 
-
-result_filename = str(id)+"-message"+str(message_id)+"-reposts.csv"
+result_filename = str(group_id)+"-message"+str(message_id)+"-reposts.csv"		
 work_with_csv.write_to_result(result_filename, data, fieldnames)
+work_with_csv.write_to_result('not_found.csv', not_found, fieldnames)

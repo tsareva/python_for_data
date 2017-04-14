@@ -22,15 +22,15 @@ list = []
 for row in data_members:
 	list.append(row[0])
 
+source = "-19732513"#raw_input("Enter id for start group: ")
+m_id = "235977"#raw_input("Enter id for start message: ")
+filename = source + "-message" + m_id + '-reposts.csv'
+group_id = source + "-message" + m_id
+
 data, fieldnames = work_with_csv.read_csv_file(filename)
 
-source = raw_input("Enter id for start group")
-m_id = raw_input("Enter id for start message")
-filename = source + "message" + m_id + '-reposts.csv'
-group_id = source + "message" + m_id
-
-
-g.add_node(source) #start message
+node = g.add_node(source) #start message
+node['membership'] = "start post"
 
 for row in data:
 	node = g.add_node(row[3])

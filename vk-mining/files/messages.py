@@ -114,3 +114,22 @@ def get_post_data(post):
 		print "User id ", post[u'from_id']
 		print "Post id", post[u'id']
 		print post[u'likes'][u'count']
+		
+def get_all_reposts(group_id, message_id):
+	while True:
+		try:
+			data = []
+			offset=0
+			get_data = ["Start with it"]
+			while len(get_data) <> 0:
+				reposts = get_reposts(group_id, message_id, offset)
+				get_data = get_repost_data(reposts)
+				for line in get_data:
+					if line not in data:
+						data.append(line)
+				print "Get %s reposts" % len(data)
+				offset+=150
+			return data
+		except:
+			time.sleep(5)
+			continue
