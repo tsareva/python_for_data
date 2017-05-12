@@ -91,7 +91,6 @@ def get_post_data(post):
 	try:
 		line = []
 		line.append(post[u'date'])
-		line.append(datetime.datetime.fromtimestamp(int(post[u'date'])).strftime('%Y-%m-%d %H:%M:%S'))
 		line.append(post[u'id'])
 		line.append(post[u'from_id'])
 		line.append(post[u'copy_owner_id'])

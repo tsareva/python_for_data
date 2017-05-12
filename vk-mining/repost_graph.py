@@ -22,8 +22,8 @@ list = []
 for row in data_members:
 	list.append(row[0])
 
-source = "-19732513"#raw_input("Enter id for start group: ")
-m_id = "235977"#raw_input("Enter id for start message: ")
+source = raw_input("Enter id for start group: ")
+m_id = raw_input("Enter id for start message: ")
 filename = source + "-message" + m_id + '-reposts.csv'
 group_id = source + "-message" + m_id
 
@@ -33,17 +33,19 @@ node = g.add_node(source) #start message
 node['membership'] = "start post"
 
 for row in data:
-	node = g.add_node(row[3])
-	node['unixdate'] = row[0]
-	node['source'] = row[4]
-	node['copy_text'] = row[7]
-	node['reposter type'] = row[8]
-	if row[3] in list:
+	node = g.add_node(row[4])
+	node['unixdate'] = row[1]
+	node['source'] = row[5]
+	node['copy_text'] = row[8]
+	node['reposter type'] = row[9]
+	if int(row[4]) < 0:
+		node['membership'] = "group"
+	elif row[4] in list:
 		node['membership'] = "group's member"
 
 for row in data:
-	n1 = row[3]
-	n2 = row[4]
+	n1 = row[4]
+	n2 = row[5]
 	g.add_edge_by_label(n1, n2)
 	
 graphname = group_id+"Graph.graphml"

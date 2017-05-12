@@ -10,7 +10,7 @@ import messages
 import time, sqlite3, vkontakte
 import pprint
 
-group_id = 'privivkanet' #vk.com/privivkanet
+group_id = 'brr2017' #vk.com/privivkanet
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
 #getting info about start group
@@ -54,10 +54,10 @@ if len(groups_from_db) > 1:
 			print "%s of %s done" % (l, len(groups_from_db))
 			write_to_db.commited()
 
-posts = messages.get_wall_messages(group_id)
-for post in posts[:10]:
-	post_dict = messages.get_message_info(posts)
-	write_to_db.update_message(post_dict)
+#posts = messages.get_wall_messages(group_id)
+#for post in posts[:10]:
+#	post_dict = messages.get_message_info(posts)
+#	write_to_db.update_message(post_dict)
 write_to_db.commited()
 	
 
