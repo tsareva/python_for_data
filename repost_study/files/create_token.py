@@ -5,7 +5,13 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import codecs, csv
 import webbrowser
-import urllib, vkontakte
+import urllib, vkontakte, time
+
+def get_server_time():
+	token = open("files/token.txt").read()
+	vk = vkontakte.API(token=token)
+	server_time = vk.getServerTime()
+	print "Time now: ", time.ctime(int(server_time))
 
 def find_out_token(url):
 	token_start = url.index("token=") + 6

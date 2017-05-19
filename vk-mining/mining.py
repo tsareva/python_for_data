@@ -10,7 +10,7 @@ import messages
 import time, sqlite3, vkontakte
 import pprint
 
-group_id = 'brr2017' #vk.com/privivkanet
+group_id = '146677594' #vk.com/privivkanet
 current_date = time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
 
 #getting info about start group
@@ -22,7 +22,7 @@ write_to_db.compare_groups_with_db(memberships)
 write_to_db.add_group_count(group_id, count)
 write_to_db.update_Groups_table(group_info)
 write_to_db.update_group_contacts(group_info, contacts)
-write_to_db.update_group_links(group_info, links)
+#write_to_db.update_group_links(group_info, links)
 write_to_db.commited()
 
 #getting info about groups in which members of start group are

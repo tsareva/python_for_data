@@ -4,23 +4,18 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 sys.path.append('files/')
-import messages
+import group
+import user_info as ui
 import create_token as ct
 import time, sqlite3, vkontakte, time
 import pandas as pd
 
-def get_server_time():
-	token = open("files/token.txt").read()
-	vk = vkontakte.API(token=token)
-	server_time = vk.getServerTime()
-	print "Time now: ", time.ctime(int(server_time))
-	
 try:
-	get_server_time()
+	ct.get_server_time()
 except vkontakte.api.VKError as error:
 	if error.code == 5:
 		ct.create_token()
-		get_server_time()
+		ct.get_server_time()
 		quit()
 	else:
 		print error
@@ -34,6 +29,21 @@ c = con.cursor()
 c.execute('SELECT Reposts.from_user FROM Reposts WHERE Reposts.from_user > 0')
 users = []
 for item in c.fetchall(): users.append(item[0])
+
+print "There are %s users" % len(users)
+
+all_friends = []
+n = 1
+for user_id in users:
+	print "Getting friends for %s user of %s" % (n, len(users))
+	friends = ui.get_friends(user_id)
+	all_friends += friends
+	n+=1
+
+fieldnames = ['user_id', 'friend_id']
+df = pd.DataFrame(all_friends, columns = fieldnames)
+c.execute('DROP TABLE Friends IF EXIST')
+result.to_sql('Friends', con)
 
 c.execute('SELECT Reposts.from_user FROM Reposts WHERE Reposts.from_user < 0')
 groups = []
